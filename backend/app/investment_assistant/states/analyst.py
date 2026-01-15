@@ -20,11 +20,10 @@ class Company(BaseModel):
     sectors: List[str]
 
 class InterviewState(BaseModel):
-    max_num_turns: int = 2
+    max_expert_responses: int = 2
     context: Annotated[List[str], operator.add] = []# Source docs
     analyst: Analyst # Analyst asking questions
     company: Company # Company for which research is being conducted
-    interview: str = "" # Interview transcript
     sections: List[str] = [] # Final key we duplicate in outer state for Send() API
     interview_messages: Annotated[List[AnyMessage], add_messages]
     search_query: str = ""

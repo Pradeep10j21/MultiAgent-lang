@@ -1,15 +1,16 @@
 import asyncio
 from langchain_community.document_loaders import WikipediaLoader
+
 from investment_assistant.states import InterviewState
+from investment_assistant.utils.data_processing import format_wikipedia_documents
 
 
 async def search_wikipedia(state: InterviewState) -> InterviewState:
     """Retrieve docs from Wikipedia (async wrapper)"""
 
     search_query = state.search_query
-    # print("Wikipedia search query:", repr(search_query))
 
-    if not search_query or not search_query.strip():
+    if not search_query.strip():
         return {
             "context": ["<Document>Wikipedia search skipped: empty query</Document>"]
         }
@@ -21,12 +22,6 @@ async def search_wikipedia(state: InterviewState) -> InterviewState:
         ).load()
     )
 
-    formatted_search_docs = "\n\n---\n\n".join(
-        [
-            f'<Document source="{doc.metadata["source"]}" page="{doc.metadata.get("page", "")}"/>\n'
-            f'{doc.page_content}\n</Document>'
-            for doc in search_docs
-        ]
-    )
+    formatted_search_docs = format_wikipedia_documents(search_docs)
 
     return {"context": [formatted_search_docs]}

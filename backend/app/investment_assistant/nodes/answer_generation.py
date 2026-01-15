@@ -1,40 +1,27 @@
-from langchain.messages import SystemMessage, HumanMessage
+from langchain.messages import SystemMessage, HumanMessage, AIMessage
 
 from investment_assistant.utils.models import model
 from investment_assistant.states import InterviewState
+from investment_assistant.prompts.answer_generation import system_prompt
+from investment_assistant.utils.data_processing import swap_message_roles
 
-answer_instructions = """You are a subject-matter expert from "{company.name}, {company.country}", being interviewed by an industry analyst.
-The analyst’s area of focus is: {goals}.
-
-You must answer the analyst’s question using ONLY the information provided in the context below.
-
-<context>
-{context}
-</context>
-
-When answering questions, follow these guidelines:
-1. The analyst’s question is contained in the most recent AIMessage. Answer that question directly.
-2. Use ONLY information explicitly stated in the context.
-3. If a question asks about entity-specific strategies, actions, or decisions, but the context only contains sector-level, policy-level, or market-level information, respond by explaining the relevant impacts at the level supported by the context, without attributing internal strategies, decisions, or actions to the entity.
-4. Do NOT introduce external knowledge, assumptions, or general industry facts.
-5. Maintain a clear, professional, expert interview tone.
-6. Be precise, factual, and detailed. Avoid speculation.
-"""
 
 async def generate_answer(state: InterviewState):
     """ Node to answer a question """
 
-    # Get state
     analyst = state.analyst
     company = state.company
-    messages = state.interview_messages[1:]
-    for i in range(0, len(messages), 2):
-        messages[i] = HumanMessage(content=messages[i].content)
     context = state.context
 
+    messages = swap_message_roles(state.interview_messages)
+
     # Answer question
-    system_message = answer_instructions.format(goals=analyst.persona, context=context, company=company)
-    answer = await model.ainvoke([SystemMessage(content=system_message)]+messages)
+    system_message = system_prompt.format(
+        goals=analyst.persona,
+        context=context,
+        company=company
+        )
+    answer = await model.ainvoke([SystemMessage(content=system_message), *messages])
 
     # Append the response as human message so that Analyst understands it's from the human expert
     answer = HumanMessage(content=answer.content)

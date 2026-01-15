@@ -1,30 +1,63 @@
-from pydantic import BaseModel, Field
-from langchain.messages import SystemMessage, HumanMessage
-from langgraph.graph import END
-from langgraph.types import Send, interrupt
+from langchain.messages import HumanMessage
+from langgraph.types import Send
 
 from investment_assistant.states import ResearchStateWithMessage
 from investment_assistant.states import Analyst, Company
-from investment_assistant.utils.models import model
 from investment_assistant.utils.analysts import analyst_data
+from investment_assistant.prompts.human_approval import interview_initiate_prompt
 
-
-class Approval(BaseModel):
-    approved: bool = Field(False, description="True if user has approved, False if user requested changes")
 
 def human_in_the_loop(state: ResearchStateWithMessage):
     pass
 
+def build_interview_send(analyst: Analyst, company: Company) -> Send:
+        """
+        Create a Send event for initiating an interview with a given analyst.
+        """
+        interview_focus = " ".join(
+            analyst.role.split()[:-1] + ["Analysis"]
+        )
+
+        initiate_prompt = interview_initiate_prompt.format(
+            company_name=company.name,
+            country=company.country,
+            focus=interview_focus,
+        )
+
+        return Send(
+            "conduct_interview",
+            {
+                "analyst": analyst,
+                "company": company,
+                "interview_messages": [
+                    HumanMessage(content=initiate_prompt)
+                ],
+            },
+        )
+
 async def should_continue(state: ResearchStateWithMessage):
-    """ Return the next node to execute """
+    """
+    Decision making node:
+    - If approved -> fan out interviews
+    - Else -> go back to gather_company_info
+    """
 
     if state.approved:
-        analysts = [Analyst(name=analyst["name"], role=analyst["role"], description=analyst["description"]) for analyst in analyst_data]
-        company = Company(name=state.company_name, country=state.country, sectors=state.sectors)
-        return [Send("conduct_interview", {
-            "analyst": analyst,
-            "company": company,
-            "interview_messages": [HumanMessage(content=f"So you said you are conducting an interview with an expert from {company.name}, {company.country} focusing on {" ".join(analyst.role.split()[:-1] + ["Analysis"])}?")]
-        }) for analyst in analysts]
+        analysts = [
+            Analyst(
+                name=analyst["name"],
+                role=analyst["role"],
+                description=analyst["description"]
+                )
+            for analyst in analyst_data
+            ]
+        
+        company = Company(
+            name=state.company_name,
+            country=state.country,
+            sectors=state.sectors
+            )
+        
+        return [build_interview_send(analyst, company) for analyst in analysts]
     
     return "gather_company_info"

@@ -17,8 +17,8 @@ async def lifespan(app: FastAPI):
     
     print("Postgres initiated")
 
-    checkpointer_cm = AsyncPostgresSaver.from_conn_string(settings.DB_URI_CHECKPOINTER)
-    checkpointer = await checkpointer_cm.__aenter__()
+    checkpointer_manager = AsyncPostgresSaver.from_conn_string(settings.DB_URI_CHECKPOINTER)
+    checkpointer = await checkpointer_manager.__aenter__()
     await checkpointer.setup()
 
     app.state.checkpointer = checkpointer
@@ -28,7 +28,7 @@ async def lifespan(app: FastAPI):
 
     yield
 
-    await checkpointer_cm.__aexit__(None, None, None)
+    await checkpointer_manager.__aexit__(None, None, None)
     print("Checkpointer and postgres connection closed")
 
 
@@ -41,7 +41,6 @@ app.include_router(chat_router, prefix='/chat')
 
 origins = ['http://localhost:5173']
 
-# middleware registration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,

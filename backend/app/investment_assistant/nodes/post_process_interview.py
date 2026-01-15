@@ -1,4 +1,4 @@
-from langchain.messages import AIMessage, SystemMessage, HumanMessage
+from langchain.messages import SystemMessage, HumanMessage
 from langchain_core.messages import get_buffer_string
 
 from investment_assistant.states import InterviewState
@@ -24,7 +24,7 @@ def route_messages(state: InterviewState, name: str = "expert"):
     max_num_turns = state.max_num_turns
 
     # Check the number of expert answers 
-    num_responses = len([m for m in messages if isinstance(m, AIMessage) and m.name == name])
+    num_responses = len([m for m in messages if isinstance(m, HumanMessage) and m.name == name])
 
     # End if expert has answered more than the max turns
     if num_responses >= max_num_turns:

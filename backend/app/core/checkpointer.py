@@ -4,4 +4,5 @@ from investment_assistant.core.settings import settings
 postgres_checkpointer = AsyncPostgresSaver.from_conn_string(
     settings.DB_URI
 )
-# postgres_checkpointer = MemorySaver()
+# postgres_checkpointer = MemorySaver(=)
+# Test 2 - 1

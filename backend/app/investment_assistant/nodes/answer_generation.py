@@ -35,9 +35,9 @@ async def generate_answer(state: InterviewState):
     # Answer question
     system_message = answer_instructions.format(goals=analyst.persona, context=context, company=company)
     answer = await model.ainvoke([SystemMessage(content=system_message)]+messages)
-            
-    # Name the message as coming from the expert
-    answer.name = "expert"
+
+    # Append the response as human message so that Analyst understands it's from the human expert
+    answer = HumanMessage(content=answer.content)
+    answer.name = "expert"  # to track number of interview turns
     
-    # Append it to state
     return {"interview_messages": [answer]}

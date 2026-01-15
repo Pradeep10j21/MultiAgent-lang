@@ -15,30 +15,30 @@ async def chat(graph: CompiledStateGraph, thread_id: str, prompt: str):
             if event_type == "on_chat_model_stream":
                 chunk = event["data"]["chunk"].content
                 if chunk:  # ignore empty chunks
-                    yield json.dumps({
+                    yield f'data: {json.dumps({
                         "type": "token",
                         "content": chunk,
                         "node": node_name
-                    }) + "\n"
+                    })}' + "\n\n"
 
             elif event_type == "on_chain_stream":
                 chunk = event["data"].get("chunk", {})
 
                 if "__interrupt__" in chunk:
-                    yield json.dumps({
+                    yield f'data: {json.dumps({
                         "type": "approval_required",
                         "thread_id": "ui-1"
-                    }) + "\n"
+                    })}' + "\n\n"
                     return  # Stop streaming
                 
             elif event_type == "on_chain_end":
-                yield json.dumps({
+                yield f'data: {json.dumps({
                     "type": "done",
                     "node": node_name
-                }) + "\n"
+                })}'+ "\n\n"
 
         # End of stream
-        yield json.dumps({"type": "stream_end"}) + "\n"     
+        yield f'data: {json.dumps({"type": "stream_end"})}' + "\n\n"     
 
     return event_gen
 
@@ -74,19 +74,19 @@ async def approve_research(graph: CompiledStateGraph, thread_id: str, action: bo
             if event_type == "on_chat_model_stream":
                 chunk = event["data"]["chunk"].content
                 if chunk:  # ignore empty chunks
-                    yield json.dumps({
+                    yield f'data: {json.dumps({
                         "type": "token",
                         "content": chunk,
                         "node": node_name
-                    }) + "\n"
+                    })}' + "\n\n"
                 
             elif event_type == "on_chain_end":
-                yield json.dumps({
+                yield f'data: {json.dumps({
                     "type": "done",
                     "node": node_name
-                }) + "\n"
+                })}' + "\n\n"
         
         # End of stream
-        yield json.dumps({"type": "stream_end"}) + "\n"
+        yield f'data: {json.dumps({"type": "stream_end"})}' + "\n\n"
 
     return "success", event_gen

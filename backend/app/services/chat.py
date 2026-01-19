@@ -1,9 +1,13 @@
 from langgraph.graph.state import CompiledStateGraph    
 import json
+import uuid
 
 from app.utils.chat import validate_thread
 
 async def chat(graph: CompiledStateGraph, thread_id: str, prompt: str):
+    if thread_id is None:
+        # New chat
+        thread_id = str(uuid.uuid4())
     thread = {"configurable": {"thread_id": thread_id}}
 
     async def event_gen():
@@ -45,14 +49,14 @@ async def chat(graph: CompiledStateGraph, thread_id: str, prompt: str):
                 })}'+ "\n\n"
 
         # End of stream
-        yield f'data: {json.dumps({"type": "stream_end"})}' + "\n\n"     
+        yield f'data: {json.dumps({"type": "stream_end", "thread_id": thread_id})}' + "\n\n"     
 
     return event_gen
 
 async def approve_research(graph: CompiledStateGraph, thread_id: str, action: bool):
     thread = {"configurable": {"thread_id": thread_id}}
 
-    if not validate_thread(graph, thread):
+    if not await validate_thread(graph, thread):
         return "error", {"message": "Invalid thread id."}
 
     # Update state with approval action
@@ -87,6 +91,6 @@ async def approve_research(graph: CompiledStateGraph, thread_id: str, action: bo
                 })}' + "\n\n"
         
         # End of stream
-        yield f'data: {json.dumps({"type": "stream_end"})}' + "\n\n"
+        yield f'data: {json.dumps({"type": "stream_end", "thread_id": thread_id})}' + "\n\n"
 
     return "success", event_gen

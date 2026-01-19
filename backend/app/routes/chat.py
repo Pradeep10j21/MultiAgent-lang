@@ -6,8 +6,9 @@ from app.services import chat as chat_service
 
 router = APIRouter()
 
-@router.get('/approve/{thread_id}')
-async def approve_research(thread_id: str, action: bool, request: Request):
+@router.get('/approve')
+async def approve_research(action: bool, request: Request, thread_id: str):
+    
     # service returns either 'error', error_message or 'success', stream_generator
     result, return_object = await chat_service.approve_research(request.app.state.graph, thread_id, action)
 
@@ -24,8 +25,9 @@ async def approve_research(thread_id: str, action: bool, request: Request):
     )
 
 
-@router.get('/{thread_id}')
-async def chat(thread_id: str, prompt: str, request: Request):
+@router.get('/')
+async def chat(prompt: str, request: Request, thread_id: str = None):
+
     stream_generator = await chat_service.chat(request.app.state.graph, thread_id, prompt)
 
     return StreamingResponse(

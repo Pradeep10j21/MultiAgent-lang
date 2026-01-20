@@ -1,3 +1,5 @@
+import type { FormEvent } from "react";
+
 export type Role = "user" | "ai";
 
 export interface ChatMessage {
@@ -6,11 +8,15 @@ export interface ChatMessage {
 }
 
 export interface ChatInputProps {
-  onSubmit: () => void;
+  onSubmit: (e: FormEvent) => void;
   inputHandler: (value: string) => void
   inputMessage: string
 }
 
 export interface ChatListProps {
   chat: ChatMessage[]
+  approval_required: boolean
+  handle_approval: (action: boolean) => void
+  loading: boolean
+  research: boolean
 }

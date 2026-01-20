@@ -1,59 +1,85 @@
-from langgraph.graph.state import CompiledStateGraph    
+from langgraph.graph.state import CompiledStateGraph
+from motor.motor_asyncio import AsyncIOMotorDatabase
+from fastapi import BackgroundTasks
 import json
 import uuid
 
 from app.utils.chat import validate_thread
 
-async def chat(graph: CompiledStateGraph, thread_id: str, prompt: str):
+async def add_chat_to_db(thread_id: str, role: str, message: str, db: AsyncIOMotorDatabase):
+    chat_doc = {
+        "role": role,
+        "message": message
+    }
+
+    await db.chat.update_one(
+        {"thread_id": thread_id},
+        {
+            "$push": {"chat": chat_doc},
+            "$setOnInsert": {"thread_id": thread_id}
+        },
+        upsert=True
+    )
+
+async def chat(graph: CompiledStateGraph, thread_id: str, prompt: str, background_tasks: BackgroundTasks, db: AsyncIOMotorDatabase):
     if thread_id is None:
         # New chat
         thread_id = str(uuid.uuid4())
     thread = {"configurable": {"thread_id": thread_id}}
 
+    background_tasks.add_task(add_chat_to_db, thread_id, 'user', prompt, db)
+
     async def event_gen():
-        async for event in graph.astream_events(
-            {"messages": [prompt]},
-            config=thread,
-        ):
+        message_chunks = []
+
+        async for event in graph.astream_events({"messages": [prompt]}, config=thread):
             event_type = event["event"]
             node_name = event.get("metadata", {}).get("langgraph_node")
-            
+
             # Chat model streaming tokens
             if event_type == "on_chat_model_stream":
                 chunk = event["data"]["chunk"].content
 
                 if chunk:  # ignore empty chunks
+                    message_chunks.append(chunk)
+
                     yield f'data: {json.dumps({
                         "type": "token",
                         "content": chunk,
                         "node": node_name
                     })}' + "\n\n"
 
-            # Token to notify human approval required
+            # Catch interrupt and custom stream
             elif event_type == "on_chain_stream":
                 chunk = event["data"].get("chunk", {})
 
                 if "__interrupt__" in chunk:
                     yield f'data: {json.dumps({
                         "type": "approval_required",
-                        "thread_id": "ui-1"
+                        "thread_id": thread_id
                     })}' + "\n\n"
+                    
+                    background_tasks.add_task(add_chat_to_db, thread_id, 'ai', ''.join(message_chunks), db)
 
                     return  # Stop streaming
-            
-            # Token to notify end of node processing
-            elif event_type == "on_chain_end":
-                yield f'data: {json.dumps({
-                    "type": "done",
-                    "node": node_name
-                })}'+ "\n\n"
+                
+                if chunk and event['name'] == 'fake_stream':
+                    message_chunks.append(chunk)
+
+                    yield f'data: {json.dumps({
+                        "type": "token",
+                        "content": chunk,
+                        "node": node_name
+                    })}' + "\n\n"
+
+        background_tasks.add_task(add_chat_to_db, thread_id, 'ai', ''.join(message_chunks), db)
 
         # End of stream
         yield f'data: {json.dumps({"type": "stream_end", "thread_id": thread_id})}' + "\n\n"     
-
+    
     return event_gen
 
-async def approve_research(graph: CompiledStateGraph, thread_id: str, action: bool):
+async def approve_research(graph: CompiledStateGraph, thread_id: str, action: bool, background_tasks: BackgroundTasks, db: AsyncIOMotorDatabase):
     thread = {"configurable": {"thread_id": thread_id}}
 
     if not await validate_thread(graph, thread):
@@ -62,34 +88,44 @@ async def approve_research(graph: CompiledStateGraph, thread_id: str, action: bo
     # Update state with approval action
     await graph.aupdate_state(config=thread, values={"approved": action}, as_node="human_approval")
 
+    background_tasks.add_task(add_chat_to_db, thread_id, 'user', 'Approve' if action else 'Reject', db)
+
     async def event_gen():
-        async for event in graph.astream_events(
-            None,
-            config=thread,
-        ):
+        message_chunks = []
+
+        async for event in graph.astream_events(None, config=thread):
             event_type = event["event"]
             node_name = event.get("metadata", {}).get("langgraph_node")
 
             if node_name not in ('write_analysis_report', 'final_report'):
+                # Need not stream agent interview, only report should be streamed to user
                 continue
             
             # Chat model streaming tokens
             if event_type == "on_chat_model_stream":
                 chunk = event["data"]["chunk"].content
-                if chunk:  # ignore empty chunks
+
+                if chunk:
+                    message_chunks.append(chunk)
+
                     yield f'data: {json.dumps({
                         "type": "token",
                         "content": chunk,
-                        "node": node_name
+                        "node": node_name,
                     })}' + "\n\n"
             
-            # Token to notify end of node processing
+            # Token to notify end of node processing, used in UI to separate analysis reports and final report
             elif event_type == "on_chain_end":
+                if node_name == 'write_analysis_report':
+                    message_chunks.append('\n\n---\n\n')    # Separation of reports
+
                 yield f'data: {json.dumps({
                     "type": "done",
                     "node": node_name
                 })}' + "\n\n"
         
+        background_tasks.add_task(add_chat_to_db, thread_id, 'ai', ''.join(message_chunks), db)
+
         # End of stream
         yield f'data: {json.dumps({"type": "stream_end", "thread_id": thread_id})}' + "\n\n"
 

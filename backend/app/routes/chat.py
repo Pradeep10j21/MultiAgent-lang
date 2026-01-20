@@ -1,16 +1,17 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, BackgroundTasks, Depends
 from fastapi.responses import StreamingResponse, JSONResponse
-import json
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.services import chat as chat_service
+from app.database.mongo import get_mongo_db
 
 router = APIRouter()
 
 @router.get('/approve')
-async def approve_research(action: bool, request: Request, thread_id: str):
+async def approve_research(action: bool, thread_id: str, request: Request, background_tasks: BackgroundTasks, db: AsyncIOMotorDatabase = Depends(get_mongo_db)):
     
     # service returns either 'error', error_message or 'success', stream_generator
-    result, return_object = await chat_service.approve_research(request.app.state.graph, thread_id, action)
+    result, return_object = await chat_service.approve_research(request.app.state.graph, thread_id, action, background_tasks, db)
 
     if result == "error":
         return JSONResponse(content=return_object, status_code=400)
@@ -26,9 +27,9 @@ async def approve_research(action: bool, request: Request, thread_id: str):
 
 
 @router.get('/')
-async def chat(prompt: str, request: Request, thread_id: str = None):
+async def chat(prompt: str, request: Request, background_tasks: BackgroundTasks, db: AsyncIOMotorDatabase = Depends(get_mongo_db), thread_id: str = None):
 
-    stream_generator = await chat_service.chat(request.app.state.graph, thread_id, prompt)
+    stream_generator = await chat_service.chat(request.app.state.graph, thread_id, prompt, background_tasks, db)
 
     return StreamingResponse(
         stream_generator(),

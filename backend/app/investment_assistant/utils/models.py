@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-model = ChatGroq(model_name='llama-3.3-70b-versatile', streaming=True)
-cheap_model = ChatGroq(model_name='llama-3.1-8b-instant', streaming=True)
+# model = ChatGroq(model_name='llama-3.3-70b-versatile', streaming=True)
+# cheap_model = ChatGroq(model_name='llama-3.1-8b-instant', streaming=True)
 
-# model = ChatGroq(model_name='openai/gpt-oss-120b', streaming=True)
-# cheap_model = ChatGroq(model_name='openai/gpt-oss-20b', streaming=True)
+model = ChatGroq(model_name='openai/gpt-oss-120b', streaming=True)
+cheap_model = ChatGroq(model_name='openai/gpt-oss-20b', streaming=True)

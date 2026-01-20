@@ -1,10 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import ChatInput from "./ChatInput";
 import type { ChatMessage } from "../types/chat";
 import ChatList from "./ChatList";
 
 export default function Chat() {
-  const [inputMessage, setInputMessage] = useState("");
+  const [inputMessage, setInputMessage] = useState<string>("");
+  const [approvalRequired, setApprovalRequired] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [research, setResearch] = useState<boolean>(false);
   const [chat, setChat] = useState<ChatMessage[]>([]);
 
   const apiUrl = import.meta.env.VITE_API_URL;
@@ -18,9 +21,18 @@ export default function Chat() {
   // Singleton event source for stream
   const eventSourceRef = useRef<EventSource | null>(null);
 
-  // sending prompt
-  const handleSend = (): void => {
+  const closeConnection = (es: EventSource): void => {
+    es.close();
+    eventSourceRef.current = null;
+    setLoading(false);
+    setResearch(false);
+  }
+  
+  const handleSend = (e: FormEvent): void => {
+    e.preventDefault();
     if (!inputMessage.trim()) return;
+
+    setLoading(true);
 
     // 1. Add user message
     setChat((prev) => [
@@ -34,18 +46,12 @@ export default function Chat() {
 
     // 3. Open new SSE stream
     const es = new EventSource(
-      `${apiUrl}/chat/${"212113"}?prompt=${encodeURIComponent(inputMessage)}`
+      `${apiUrl}/chat?thread_id=${"212130212130"}&prompt=${encodeURIComponent(inputMessage)}`
     );
 
     // 4. Receive streamed tokens
     es.onmessage = (event) => {
       const data = JSON.parse(event.data);
-
-      if (data.type === "approval_required" || data.type === "stream_end") {
-        es.close();
-        eventSourceRef.current = null;
-        return;
-      }
 
       if (data.type === "token") {
         setChat((prev) => {
@@ -57,21 +63,106 @@ export default function Chat() {
           return next;
         });
       }
+
+      else if (data.type === "stream_end") {
+        closeConnection(es);
+        return;
+      }
+
+      else if (data.type === "approval_required"){
+        setApprovalRequired(true);
+        closeConnection(es);
+        return;
+      }
     };
 
     es.onerror = () => {
-      es.close();
-      eventSourceRef.current = null;
+      console.log('error');
+      closeConnection(es);
     };
 
     setInputMessage("");
   };
+
+  const handleApproval = (action: boolean): void => {
+    setApprovalRequired(false);
+    if (!action){
+      setChat((prev) => [
+        ...prev,
+        { role: "user", message: 'Reject' },
+      ]);
+      return
+    }
+
+    setLoading(true);
+    setResearch(true);
+    
+    // 1. Add user message
+    setChat((prev) => [
+      ...prev,
+      { role: "user", message: 'Approve' },
+      { role: "ai", message: "" }, // placeholder for streaming
+    ]);
+
+    // 2. Close any existing stream
+    eventSourceRef.current?.close();
+
+    // 3. Open new SSE stream
+    const es = new EventSource(
+      `${apiUrl}/chat/approve?thread_id=${"212130212130"}&action=1`
+    );
+
+    // 4. Receive streamed tokens
+    es.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      if (data.type === "token") {
+        setChat((prev) => {
+          const next = [...prev];
+          next[next.length - 1] = {
+            ...next[next.length - 1],
+            message: next[next.length - 1].message + data.content,
+          };
+          return next;
+        });
+      }
+
+      else if (data.type === "done" && data.node != 'final_report') {
+        setChat((prev) => {
+          const next = [...prev];
+          next[next.length - 1] = {
+            ...next[next.length - 1],
+            message: next[next.length - 1].message + '\n\n---\n\n',
+          };
+          return next;
+        });
+      }
+
+      else if (data.type === "stream_end") {
+        closeConnection(es);
+        return;
+      }
+    };
+
+    es.onerror = () => {
+      console.log('error');
+      closeConnection(es);
+    };
+  }
+
   const updateInput = (value: string) => setInputMessage(value);
+
 
   return (
     <div className="h-screen flex-1 flex flex-col p-5">
       <div className="flex-1 min-h-0 overflow-y-auto">
-        <ChatList chat={chat} />
+        <ChatList
+          chat={chat}
+          approval_required={approvalRequired}
+          handle_approval={handleApproval}
+          loading={loading}
+          research={research}
+          />
         <div ref={bottomRef} />
       </div>
 

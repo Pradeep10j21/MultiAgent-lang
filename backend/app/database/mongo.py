@@ -9,7 +9,7 @@ mongo_db: AsyncIOMotorDatabase = None
 def get_mongo_client() -> AsyncIOMotorClient:
     global mongo_client
     if mongo_client is None:
-        mongo_client = AsyncIOMotorClient(settings.mongodb_uri)
+        mongo_client = AsyncIOMotorClient(settings.MONGODB_URI)
     return mongo_client
 
 

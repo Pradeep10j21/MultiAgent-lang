@@ -74,6 +74,7 @@ markdown-it-py
 MarkupSafe
 marshmallow
 mdurl
+mongomock-motor
 motor
 multidict
 mypy_extensions

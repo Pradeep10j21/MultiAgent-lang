@@ -1,7 +1,7 @@
 from langgraph.graph import StateGraph, START, END
 
-from investment_assistant.nodes import generate_answer, generate_question, search_web, search_wikipedia, write_analysis_report, route_messages
-from investment_assistant.states import InterviewState
+from app.investment_assistant.nodes import generate_answer, generate_question, search_web, search_wikipedia, write_analysis_report, route_messages
+from app.investment_assistant.states import InterviewState
 
 
 builder = StateGraph(InterviewState)

@@ -65,6 +65,9 @@ OUTPUT FORMAT (Markdown required, exact structure):
 ### Why You Should Not Invest
 - ...
 
+### Final Verdict: [INVEST / DO NOT INVEST]
+**Reasoning**: Provide a concise 2-3 sentence summary explaining exactly why this specific decision was reached, weight the most critical strengths against the most dangerous threats.
+
 FALLBACK RULES:
 - If the input does not support one or more SWOT categories, include only the supported categories.
 - If the input does not support a clear investment or non-investment argument, state only what is explicitly supported and do not infer or exaggerate.

@@ -2,9 +2,9 @@ from langchain.messages import SystemMessage, HumanMessage
 from langchain_core.messages import get_buffer_string
 from langfuse import observe
 
-from investment_assistant.states import InterviewState
-from investment_assistant.utils.models import llm_call
-from investment_assistant.prompts.post_process_interview import system_prompt
+from app.investment_assistant.states import InterviewState
+from app.investment_assistant.utils.models import llm_call
+from app.investment_assistant.prompts.post_process_interview import system_prompt
 
 
 def route_messages(state: InterviewState, name: str = "expert"):

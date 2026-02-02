@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Assistant - Control Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 1200px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        
+        .status {
+            background: #f0f4ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+        
+        .status-icon {
+            margin-right: 10px;
+            font-size: 1.3em;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            color: #667eea;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+        
+        .card-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        .card-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .card-desc {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        
+        .highlight .card-title,
+        .highlight .card-desc {
+            color: white;
+        }
+        
+        .links {
+            background: #fff3cd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .links-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #856404;
+        }
+        
+        .link-item {
+            margin: 5px 0;
+        }
+        
+        .link-item a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .link-item a:hover {
+            text-decoration: underline;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Investment Assistant</h1>
+        <p class="subtitle">AI-Powered Investment Research Platform</p>
+        
+        <div class="status">
+            <div class="status-item">
+                <span class="status-icon">✅</span>
+                <strong>Python:</strong>&nbsp;3.12.3 Installed
+            </div>
+            <div class="status-item">
+                <span class="status-icon">✅</span>
+                <strong>Node.js:</strong>&nbsp;v22.21.0 Installed
+            </div>
+            <div class="status-item">
+                <span class="status-icon">✅</span>
+                <strong>npm:</strong>&nbsp;10.9.4 Installed
+            </div>
+            <div class="status-item">
+                <span class="status-icon">✅</span>
+                <strong>Setup Scripts:</strong>&nbsp;Ready
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">🎯 Quick Actions</h2>
+            <div class="grid">
+                <div class="card highlight" onclick="alert('Double-click start-all.bat in your project folder')">
+                    <div class="card-icon">🚀</div>
+                    <div class="card-title">START ALL</div>
+                    <div class="card-desc">Launch both servers</div>
+                </div>
+                
+                <div class="card" onclick="window.open('http://localhost:5173', '_blank')">
+                    <div class="card-icon">🌐</div>
+                    <div class="card-title">Open App</div>
+                    <div class="card-desc">Frontend UI</div>
+                </div>
+                
+                <div class="card" onclick="window.open('http://localhost:8000/docs', '_blank')">
+                    <div class="card-icon">📚</div>
+                    <div class="card-title">API Docs</div>
+                    <div class="card-desc">Backend documentation</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">📋 Setup Steps</h2>
+            <div class="grid">
+                <div class="card" onclick="alert('Run setup-backend.bat from your project folder')">
+                    <div class="card-icon">🔧</div>
+                    <div class="card-title">Setup Backend</div>
+                    <div class="card-desc">Install Python packages</div>
+                </div>
+                
+                <div class="card" onclick="alert('Run setup-frontend.bat from your project folder')">
+                    <div class="card-icon">⚙️</div>
+                    <div class="card-title">Setup Frontend</div>
+                    <div class="card-desc">Install Node packages</div>
+                </div>
+                
+                <div class="card" onclick="alert('Open backend\\.env and add your API keys')">
+                    <div class="card-icon">🔑</div>
+                    <div class="card-title">Configure Keys</div>
+                    <div class="card-desc">Add API credentials</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">📖 Documentation</h2>
+            <div class="grid">
+                <div class="card" onclick="alert('Open README_START_HERE.md in your project folder')">
+                    <div class="card-icon">📘</div>
+                    <div class="card-title">Start Here</div>
+                    <div class="card-desc">Main guide</div>
+                </div>
+                
+                <div class="card" onclick="alert('Open API_KEYS_GUIDE.md in your project folder')">
+                    <div class="card-icon">🔐</div>
+                    <div class="card-title">API Keys</div>
+                    <div class="card-desc">How to get keys</div>
+                </div>
+                
+                <div class="card" onclick="alert('Open SETUP_GUIDE.md in your project folder')">
+                    <div class="card-icon">📗</div>
+                    <div class="card-title">Setup Guide</div>
+                    <div class="card-desc">Detailed instructions</div>
+                </div>
+                
+                <div class="card" onclick="alert('Open CHECKLIST.txt in your project folder')">
+                    <div class="card-icon">✅</div>
+                    <div class="card-title">Checklist</div>
+                    <div class="card-desc">Track progress</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="links">
+            <div class="links-title">🔗 API Key Registration Links:</div>
+            <div class="link-item">🔸 GROQ: <a href="https://console.groq.com/keys" target="_blank">https://console.groq.com/keys</a></div>
+            <div class="link-item">🔸 Google Gemini: <a href="https://makersuite.google.com/app/apikey" target="_blank">https://makersuite.google.com/app/apikey</a></div>
+            <div class="link-item">🔸 Tavily: <a href="https://tavily.com" target="_blank">https://tavily.com</a></div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Location:</strong> C:\Users\Kushhal S\OneDrive\Desktop\investment_assistant\investment_assistant</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">💡 Tip: Bookmark this page for quick access to all links and info!</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,112 @@
+═══════════════════════════════════════════════════════════
+    INVESTMENT ASSISTANT - SETUP CHECKLIST
+═══════════════════════════════════════════════════════════
+
+📋 PREREQUISITES (Already Done!)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+☑ Python 3.12.3 installed
+☑ Node.js v22.21.0 installed  
+☑ npm 10.9.4 installed
+☑ Environment files created
+☑ Startup scripts created
+☑ Documentation created
+
+
+🔑 STEP 1: GET API KEYS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+□ GROQ API Key
+  → Visit: https://console.groq.com/keys
+  → Sign up and create API key
+  → Copy key
+  
+□ Google Gemini API Key
+  → Visit: https://makersuite.google.com/app/apikey
+  → Sign in with Google
+  → Create API key
+  → Copy key
+  
+□ Tavily API Key
+  → Visit: https://tavily.com
+  → Sign up for account
+  → Get API key from dashboard
+  → Copy key
+
+□ Update backend\.env file with all 3 keys
+
+
+💾 STEP 2: INSTALL DEPENDENCIES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+□ Run setup-backend.bat
+  → Double-click the file
+  → Wait for installation to complete
+  → Press any key when done
+  
+□ Run setup-frontend.bat
+  → Double-click the file
+  → Wait for installation to complete
+  → Press any key when done
+
+
+🚀 STEP 3: START APPLICATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+□ Run start-all.bat
+  → Double-click the file
+  → Two terminal windows will open
+  → Wait for both servers to start
+
+
+✅ STEP 4: VERIFY EVERYTHING WORKS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+□ Backend running
+  → Check terminal shows "Application startup complete"
+  → Visit: http://localhost:8000/docs
+  
+□ Frontend running
+  → Check terminal shows the local URL
+  → Visit: http://localhost:5173
+  
+□ Send a test message
+  → Type a question in the chat
+  → Verify you get a response
+
+
+═══════════════════════════════════════════════════════════
+
+⏱️ ESTIMATED TIME
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Getting API Keys: ~15 minutes
+• Installing Dependencies: ~5 minutes  
+• Starting Application: ~1 minute
+• Total: ~20 minutes
+
+═══════════════════════════════════════════════════════════
+
+📝 NOTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• All API keys have free tiers for testing
+• Databases (PostgreSQL/MongoDB) are optional
+• You can start without databases for testing
+• Keep terminal windows open while using the app
+
+═══════════════════════════════════════════════════════════
+
+❓ IF SOMETHING GOES WRONG
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Check SETUP_GUIDE.md troubleshooting section
+2. Verify API keys are correct in backend\.env
+3. Make sure no other apps are using ports 8000 or 5173
+4. Try running setup scripts again
+
+═══════════════════════════════════════════════════════════
+
+🎉 ONCE COMPLETE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+You can:
+• Ask investment questions
+• Get company analysis
+• Research market trends
+• Generate investment reports
+
+Just double-click start-all.bat anytime you want to use it!
+
+═══════════════════════════════════════════════════════════

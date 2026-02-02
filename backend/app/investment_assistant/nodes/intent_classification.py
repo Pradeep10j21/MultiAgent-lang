@@ -3,9 +3,9 @@ from typing import Literal
 from langchain.messages import SystemMessage, HumanMessage
 from langfuse import observe
 
-from investment_assistant.utils.models import llm_call_with_structured_output
-from investment_assistant.prompts.intent_classification import system_prompt
-from investment_assistant.states import ResearchStateWithMessage
+from app.investment_assistant.utils.models import llm_call_with_structured_output
+from app.investment_assistant.prompts.intent_classification import system_prompt
+from app.investment_assistant.states import ResearchStateWithMessage
 
 class IntentClassification(BaseModel):
     intent: Literal["company_research", "general_chat"] = Field(

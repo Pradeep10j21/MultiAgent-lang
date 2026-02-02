@@ -3,11 +3,11 @@ from langchain_core.runnables import RunnableLambda
 from pydantic import BaseModel, Field
 from langfuse import observe
 
-from investment_assistant.states import ResearchStateWithMessage, ResearchState
-from investment_assistant.utils.models import llm_call_with_structured_output
-from investment_assistant.utils.web_search import search_engine
-from investment_assistant.prompts.gather_company_info import company_name_extraction_prompt, structured_data_extraction_prompt
-from investment_assistant.utils.chat import fake_stream
+from app.investment_assistant.states import ResearchStateWithMessage, ResearchState
+from app.investment_assistant.utils.models import llm_call_with_structured_output
+from app.investment_assistant.utils.web_search import search_engine
+from app.investment_assistant.prompts.gather_company_info import company_name_extraction_prompt, structured_data_extraction_prompt
+from app.investment_assistant.utils.chat import fake_stream
 
 class CompanyNameOutput(BaseModel):
     company_name: str = Field(..., description="The name of the company extracted from the text.")

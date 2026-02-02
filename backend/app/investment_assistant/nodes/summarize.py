@@ -2,9 +2,9 @@ from langchain.messages import HumanMessage, SystemMessage, AIMessage, RemoveMes
 from typing import List
 from langfuse import observe
 
-from investment_assistant.states import ResearchStateWithMessage
-from investment_assistant.utils.models import llm_call
-from investment_assistant.prompts.summarize import system_prompt
+from app.investment_assistant.states import ResearchStateWithMessage
+from app.investment_assistant.utils.models import llm_call
+from app.investment_assistant.prompts.summarize import system_prompt
 
 
 TOKEN_LIMIT = 4000

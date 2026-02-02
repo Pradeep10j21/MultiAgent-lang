@@ -1,8 +1,8 @@
 from langgraph.graph import StateGraph, START, END
 
-from investment_assistant.nodes import gather_info, human_in_the_loop, should_continue, final_report, general_chat, classify_intent, token_limit_checker
-from investment_assistant.states import ResearchStateWithMessage
-from investment_assistant.graphs.interview_graph import InterviewGraph
+from app.investment_assistant.nodes import gather_info, human_in_the_loop, should_continue, final_report, general_chat, classify_intent, token_limit_checker
+from app.investment_assistant.states import ResearchStateWithMessage
+from app.investment_assistant.graphs.interview_graph import InterviewGraph
 
 def build_research_graph(checkpointer = None):
 

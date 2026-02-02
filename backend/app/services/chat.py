@@ -35,9 +35,11 @@ async def chat(graph: CompiledStateGraph, thread_id: str, prompt: str, backgroun
     async def event_gen():
         message_chunks = []
 
-        async for event in graph.astream_events({"messages": [prompt]}, config=thread):
+        print(f"DEBUG: Starting event stream for thread {thread_id} with prompt: {prompt[:50]}...")
+        async for event in graph.astream_events({"messages": [prompt]}, config=thread, version="v2"):
             event_type = event["event"]
             node_name = event.get("metadata", {}).get("langgraph_node")
+            print(f"DEBUG: Event received: {event_type} from node: {node_name}")
 
             # Chat model streaming tokens
             if event_type == "on_chat_model_stream":
@@ -46,21 +48,23 @@ async def chat(graph: CompiledStateGraph, thread_id: str, prompt: str, backgroun
                 if chunk:  # ignore empty chunks
                     message_chunks.append(chunk)
 
-                    yield f'data: {json.dumps({
+                    data = {
                         "type": "token",
                         "content": chunk,
                         "node": node_name
-                    })}' + "\n\n"
+                    }
+                    yield f'data: {json.dumps(data)}' + "\n\n"
 
             # Catch interrupt and custom stream
             elif event_type == "on_chain_stream":
                 chunk = event["data"].get("chunk", {})
 
                 if "__interrupt__" in chunk:
-                    yield f'data: {json.dumps({
+                    data = {
                         "type": "approval_required",
                         "thread_id": thread_id
-                    })}' + "\n\n"
+                    }
+                    yield f'data: {json.dumps(data)}' + "\n\n"
                     
                     background_tasks.add_task(add_chat_to_db, thread_id, 'ai', ''.join(message_chunks), db)
 
@@ -69,11 +73,12 @@ async def chat(graph: CompiledStateGraph, thread_id: str, prompt: str, backgroun
                 if chunk and event['name'] == 'fake_stream':
                     message_chunks.append(chunk)
 
-                    yield f'data: {json.dumps({
+                    data = {
                         "type": "token",
                         "content": chunk,
                         "node": node_name
-                    })}' + "\n\n"
+                    }
+                    yield f'data: {json.dumps(data)}' + "\n\n"
 
         background_tasks.add_task(add_chat_to_db, thread_id, 'ai', ''.join(message_chunks), db)
 
@@ -112,21 +117,23 @@ async def approve_research(graph: CompiledStateGraph, thread_id: str, action: bo
                 if chunk:
                     message_chunks.append(chunk)
 
-                    yield f'data: {json.dumps({
+                    data = {
                         "type": "token",
                         "content": chunk,
                         "node": node_name,
-                    })}' + "\n\n"
+                    }
+                    yield f'data: {json.dumps(data)}' + "\n\n"
             
             # Token to notify end of node processing, used in UI to separate analysis reports and final report
             elif event_type == "on_chain_end":
                 if node_name == 'write_analysis_report':
                     message_chunks.append('\n\n---\n\n')    # Separation of reports
 
-                yield f'data: {json.dumps({
+                data = {
                     "type": "done",
                     "node": node_name
-                })}' + "\n\n"
+                }
+                yield f'data: {json.dumps(data)}' + "\n\n"
         
         background_tasks.add_task(add_chat_to_db, thread_id, 'ai', ''.join(message_chunks), db)
 
@@ -137,15 +144,30 @@ async def approve_research(graph: CompiledStateGraph, thread_id: str, action: bo
 
 
 async def get_chat_list(thread_id: str, db: AsyncIOMotorDatabase):
-    result = await db.chat.find_one({"thread_id": thread_id})
-    return JSONResponse(content={'chat': result['chat']})
+    try:
+        result = await db.chat.find_one({"thread_id": thread_id})
+        if not result or 'chat' not in result:
+            return JSONResponse(content={'chat': []})
+        return JSONResponse(content={'chat': result['chat']})
+    except Exception as e:
+        import traceback
+        error_msg = f"{str(e)}\n{traceback.format_exc()}"
+        print(f"ERROR in get_chat_list: {error_msg}")
+        return JSONResponse(content={'chat': [], 'error': error_msg}, status_code=500)
 
 
 async def get_chat_history(db: AsyncIOMotorDatabase):
-    docs = []
-    async for doc in db.chat.find({}):
-        docs.append({
-            'thread_id': doc['thread_id'],
-            'title': doc['chat'][0]['message']
-        })
-    return JSONResponse(content={'history': docs[::-1]})
+    try:
+        docs = []
+        async for doc in db.chat.find({}):
+            if 'chat' in doc and len(doc['chat']) > 0:
+                docs.append({
+                    'thread_id': doc['thread_id'],
+                    'title': doc['chat'][0]['message']
+                })
+        return JSONResponse(content={'history': docs[::-1]})
+    except Exception as e:
+        import traceback
+        error_msg = f"{str(e)}\n{traceback.format_exc()}"
+        print(f"ERROR in get_chat_history: {error_msg}")
+        return JSONResponse(content={'history': [], 'error': error_msg}, status_code=500)

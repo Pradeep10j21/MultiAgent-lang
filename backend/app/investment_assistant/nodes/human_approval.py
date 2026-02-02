@@ -1,10 +1,10 @@
 from langchain.messages import HumanMessage
 from langgraph.types import Send
 
-from investment_assistant.states import ResearchStateWithMessage
-from investment_assistant.states import Analyst, Company
-from investment_assistant.utils.analysts import analyst_data
-from investment_assistant.prompts.human_approval import interview_initiate_prompt
+from app.investment_assistant.states import ResearchStateWithMessage
+from app.investment_assistant.states import Analyst, Company
+from app.investment_assistant.utils.analysts import analyst_data
+from app.investment_assistant.prompts.human_approval import interview_initiate_prompt
 
 
 def human_in_the_loop(state: ResearchStateWithMessage):

@@ -71,11 +71,11 @@ app = FastAPI(
 
 app.include_router(chat_router, prefix='/chat')
 
-origins = ['*']
+origins = ['https://multi-agent-bot-zeta.vercel.app']
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],

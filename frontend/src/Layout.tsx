@@ -1,7 +1,11 @@
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import SideBar from "./components/Sidebar";
 
 export default function Layout(){
+    const [thread, setThread] = useState<string | null>(null);
+    const updateThread = (thread_id: string | null) => setThread(thread_id);
+
     return(
         <div className="relative min-h-screen w-full overflow-hidden bg-[#050816]">
               {/* Main color wash */}
@@ -11,7 +15,7 @@ export default function Layout(){
         
               {/* Content */}
               <div className="relative z-10 flex">
-                <SideBar />
+                <SideBar thread={thread} handleClick={updateThread} />
                 <Outlet />
               </div>
             </div>

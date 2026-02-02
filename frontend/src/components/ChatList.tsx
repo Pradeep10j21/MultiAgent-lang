@@ -22,10 +22,10 @@ export default function ChatList({ chat, approval_required, handle_approval, loa
             })}
             { approval_required? (
                 <div>
-                    <button onClick={(e) => handle_approval(true)} className="bg-white w-20 rounded-lg py-2 text-black text-sm cursor-pointer shadow-xl hover:bg-white/80 duration-200 me-2">
+                    <button onClick={() => handle_approval(true)} className="bg-white w-20 rounded-lg py-2 text-black text-sm cursor-pointer shadow-xl hover:bg-white/80 duration-200 me-2">
                         Approve
                     </button>
-                    <button onClick={(e) => handle_approval(false)} className="bg-white/20 w-20 rounded-lg py-2 border border-white/40 text-sm cursor-pointer shadow-xl hover:bg-white/40 duration-200">
+                    <button onClick={() => handle_approval(false)} className="bg-white/20 w-20 rounded-lg py-2 border border-white/40 text-sm cursor-pointer shadow-xl hover:bg-white/40 duration-200">
                         Reject
                     </button>
                 </div>

@@ -14,7 +14,8 @@ async def search_wikipedia(state: InterviewState) -> InterviewState:
         return {
             "context": ["<Document>Wikipedia search skipped: empty query</Document>"]
         }
-
+    # Search Wikipedia
+    print(f"📚 Initiating Wikipedia Search: {search_query}...")
     try:
         search_docs = await asyncio.to_thread(
             lambda: WikipediaLoader(

@@ -35,6 +35,7 @@ async def generate_question(state: InterviewState) -> InterviewState:
 
     # Generate search query for web search
     search_query = await generate_search_query([*state.interview_messages[1:], question])
+    print(f"🔍 SEARCH QUERY: {search_query}\n")
 
     return {
         "interview_messages": [question],

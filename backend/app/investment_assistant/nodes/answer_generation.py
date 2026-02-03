@@ -27,7 +27,7 @@ async def generate_answer(state: InterviewState):
     
     # Log expert answer to terminal
     print(f"\n{'='*60}")
-    print(f"🧠 EXPERT: {answer.content[:500]}{'...' if len(answer.content) > 500 else ''}")
+    print(f"🧠 EXPERT: {answer.content}")
     print(f"{'='*60}")
 
     # Append the response as human message so that Analyst understands it's from the human expert

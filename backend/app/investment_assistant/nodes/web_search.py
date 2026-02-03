@@ -14,6 +14,7 @@ async def search_web(state: InterviewState) -> InterviewState:
         }
     
     # Search web
+    print(f"🌐 Initiating Web Search: {search_query}...")
     try:
         data = await search_engine.ainvoke({"query": search_query})
         search_docs = data.get("results", data)

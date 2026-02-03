@@ -8,6 +8,7 @@ from app.investment_assistant.prompts.human_approval import interview_initiate_p
 
 
 def human_in_the_loop(state: ResearchStateWithMessage):
+    print(f"\n⏸️  WAITING FOR APPROVAL: Research for {state.company_name} ({state.stock_symbol})")
     pass
 
 def build_interview_send(analyst: Analyst, company: Company) -> Send:
